@@ -82,6 +82,6 @@ async def download_youtube_audio(youtube_url: str) -> str:
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", type=str, default='https://youtu.be/VGDlKrCKh6E')
+    parser.add_argument("--url", type=str, default='https://youtu.be/5C_HPTJg5ek')
     args = parser.parse_args()
     asyncio.run(download_youtube_audio(args.url))

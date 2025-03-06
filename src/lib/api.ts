@@ -1,4 +1,4 @@
-import { VideoInfo, Transcription } from './types';
+import { VideoInfo, Transcription, VideoSection } from './types';
 
 // Backend API base URL
 const API_BASE_URL = 'http://localhost:8002';
@@ -169,4 +169,137 @@ export const extractYoutubeVideoId = (url: string): string | null => {
   const match = url.match(regExp);
   
   return (match && match[2].length === 11) ? match[2] : null;
+};
+
+// Extract audio from a YouTube video
+export const extractAudio = async (videoId: string): Promise<void> => {
+  console.log('Extracting audio for video:', videoId);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/videos/extract_audio`, {
+      method: 'POST',
+      ...defaultFetchOptions,
+      body: JSON.stringify({ youtube_url: `https://www.youtube.com/watch?v=${videoId}` }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Audio extraction error response:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(errorData.detail || 'Failed to extract audio');
+      } catch (e) {
+        throw new Error(`Failed to extract audio: ${response.status} ${response.statusText}`);
+      }
+    }
+    
+    // Ensure we fully consume the response
+    await response.text();
+    console.log('Audio extraction completed successfully');
+  } catch (error) {
+    console.error('Error extracting audio:', error);
+    throw error;
+  }
+};
+
+// Start transcription of a video
+export const startTranscription = async (videoId: string): Promise<void> => {
+  console.log('Starting transcription for video:', videoId);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/videos/transcribe`, {
+      method: 'POST',
+      ...defaultFetchOptions,
+      body: JSON.stringify({ youtube_url: `https://www.youtube.com/watch?v=${videoId}` }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Transcription start error response:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(errorData.detail || 'Failed to start transcription');
+      } catch (e) {
+        throw new Error(`Failed to start transcription: ${response.status} ${response.statusText}`);
+      }
+    }
+    
+    // Ensure we fully consume the response
+    await response.text();
+    console.log('Transcription completed successfully');
+  } catch (error) {
+    console.error('Error starting transcription:', error);
+    throw error;
+  }
+};
+
+// Create sections from a transcribed video
+export const createSections = async (videoId: string): Promise<VideoSection[]> => {
+  console.log('Creating sections for video:', videoId);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/videos/create_sections`, {
+      method: 'POST',
+      ...defaultFetchOptions,
+      body: JSON.stringify({ youtube_url: `https://www.youtube.com/watch?v=${videoId}` }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Section creation error response:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(errorData.detail || 'Failed to create sections');
+      } catch (e) {
+        throw new Error(`Failed to create sections: ${response.status} ${response.statusText}`);
+      }
+    }
+    
+    const data = await response.json();
+    console.log('Sections created successfully:', data);
+    
+    // Return the sections data which includes transcription segments
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Error creating sections:', error);
+    throw error;
+  }
+};
+
+// Answer a question about a video at a specific timestamp
+export const answerQuestion = async (
+  videoId: string,
+  question: string,
+  timestamp: string
+): Promise<string> => {
+  console.log('Answering question for video:', videoId, 'Question:', question, 'Timestamp:', timestamp);
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/videos/answer_question`, {
+      method: 'POST',
+      ...defaultFetchOptions,
+      body: JSON.stringify({
+        youtube_url: `https://www.youtube.com/watch?v=${videoId}`,
+        question: question,
+        timestamp: timestamp
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Answer question error response:', errorText);
+      try {
+        const errorData = JSON.parse(errorText);
+        throw new Error(errorData.detail || 'Failed to answer question');
+      } catch (e) {
+        throw new Error(`Failed to answer question: ${response.status} ${response.statusText}`);
+      }
+    }
+    
+    // The response is a string
+    return await response.text();
+  } catch (error) {
+    console.error('Error answering question:', error);
+    throw error;
+  }
 };

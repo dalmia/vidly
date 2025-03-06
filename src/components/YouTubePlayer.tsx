@@ -69,11 +69,20 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ videoId, title, onTimeUpd
                     autoplay: 0,
                     modestbranding: 1,
                     rel: 0,
+                    enablejsapi: 1,
+                    origin: window.location.origin,
+                    playsinline: 1,
                 },
                 events: {
-                    onReady: () => {
+                    onReady: (event: any) => {
                         playerInitializedRef.current = true;
                         currentVideoIdRef.current = videoId;
+
+                        // Ensure the iframe has an ID that can be referenced
+                        const iframe = event.target.getIframe();
+                        if (iframe) {
+                            iframe.id = `youtube-iframe-${videoId}`;
+                        }
                     },
                     onStateChange: (event: any) => {
                         // Start tracking time when video is playing

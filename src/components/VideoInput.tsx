@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,16 +7,44 @@ import { Youtube, ArrowRight, Loader2 } from 'lucide-react';
 
 const VideoInput: React.FC = () => {
   const [inputUrl, setInputUrl] = useState('');
+  const [processingUrl, setProcessingUrl] = useState('');
   const { processVideoUrl, status, error } = useVideo();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputUrl.trim()) {
+      setProcessingUrl(inputUrl.trim());
       processVideoUrl(inputUrl.trim());
     }
   };
 
-  const isLoading = status === 'loading' || status === 'transcribing';
+  // Reset processing URL when status is ready or error
+  useEffect(() => {
+    if (status === 'ready' || status === 'error') {
+      setProcessingUrl('');
+    }
+  }, [status]);
+
+  // Determine if we're in a loading state
+  const isLoading = status !== 'idle' && status !== 'ready' && status !== 'error';
+
+  const getStatusMessage = () => {
+    switch (status) {
+      case 'loading':
+        return 'Loading video info';
+      case 'extracting':
+        return 'Processing video';
+      case 'transcribing':
+        return 'Transcribing';
+      case 'sectioning':
+        return 'Creating chapters';
+      default:
+        return 'Processing';
+    }
+  };
+
+  // Check if we're in a potentially long operation
+  const isLongOperation = status === 'transcribing' || status === 'sectioning';
 
   return (
     <motion.div
@@ -34,10 +61,10 @@ const VideoInput: React.FC = () => {
             </div>
 
             <Input
-              value={inputUrl}
+              value={isLoading ? processingUrl : inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               placeholder="Paste a YouTube video URL"
-              className={`pl-10 pr-4 h-14 glass hover-glass focus-within-glass transition-all duration-300 text-base ${error ? 'border-red-300 focus-visible:ring-red-300' : ''
+              className={`pl-10 pr-4 h-12 glass hover-glass focus-within-glass transition-all duration-300 text-base ${error ? 'border-red-300 focus-visible:ring-red-300' : ''
                 }`}
               disabled={isLoading}
             />
@@ -56,17 +83,17 @@ const VideoInput: React.FC = () => {
 
           <Button
             type="submit"
-            disabled={!inputUrl.trim() || isLoading}
-            className="h-14 px-6"
+            disabled={(!inputUrl.trim() && !processingUrl) || isLoading}
+            className="h-12 px-6 min-w-[140px] relative"
           >
             {isLoading ? (
               <>
                 <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                {status === 'transcribing' ? 'Transcribing...' : 'Processing...'}
+                <span>{getStatusMessage()}</span>
               </>
             ) : (
               <>
-                <span className="">Start</span>
+                <span>Start</span>
               </>
             )}
           </Button>
@@ -82,7 +109,7 @@ const VideoInput: React.FC = () => {
           </motion.p>
         )}
 
-        {status === 'transcribing' && (
+        {isLongOperation && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}

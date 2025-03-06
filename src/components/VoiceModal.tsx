@@ -48,7 +48,6 @@ interface VoiceModalProps {
     isOpen: boolean;
     onClose: () => void;
     onTranscript: (transcript: string) => void;
-    buttonPosition?: { top: number; left: number; width: number };
 }
 
 // Add missing type definitions
@@ -62,7 +61,7 @@ interface ExtendedSpeechRecognition extends SpeechRecognition {
     onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any) | null;
 }
 
-const VoiceModal: React.FC<VoiceModalProps> = ({ isOpen, onClose, onTranscript, buttonPosition }) => {
+const VoiceModal: React.FC<VoiceModalProps> = ({ isOpen, onClose, onTranscript }) => {
     const [transcript, setTranscript] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
     const [isListening, setIsListening] = useState(false);
@@ -247,78 +246,70 @@ const VoiceModal: React.FC<VoiceModalProps> = ({ isOpen, onClose, onTranscript, 
         }
     };
 
-    // Calculate position based on button location
-    const getModalPosition = () => {
-        if (!buttonPosition) return {};
-
-        return {
-            position: 'absolute',
-            bottom: `calc(100% - ${buttonPosition.top}px + 10px)`,
-            left: `${buttonPosition.left + (buttonPosition.width / 2)}px`,
-            transform: 'translateX(-50%)'
-        } as React.CSSProperties;
-    };
+    // Use a simple fixed position that's always the same
+    const modalStyle = {
+        position: 'fixed',
+        bottom: '100px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 10000
+    } as React.CSSProperties;
 
     return (
         <AnimatePresence>
             {isOpen && (
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50"
-                    onClick={handleDone}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="bg-black rounded-full px-6 py-3 shadow-lg flex items-center space-x-3 border border-primary"
+                    style={modalStyle}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
                 >
-                    <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 20, opacity: 0 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="bg-black rounded-full px-4 py-2 shadow-lg flex items-center space-x-2 max-w-xs"
-                        style={getModalPosition()}
-                        onClick={e => e.stopPropagation()}
+                    {/* Close button */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleDone}
+                        className="h-8 w-8 rounded-full bg-black/50 text-white hover:bg-black/30 flex-shrink-0"
+                        disabled={isProcessing}
                     >
-                        {/* Close button */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleDone}
-                            className="h-8 w-8 rounded-full bg-black/80 text-white hover:bg-black/60 flex-shrink-0"
-                            disabled={isProcessing}
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
+                        <X className="h-4 w-4" />
+                    </Button>
 
-                        {/* Waveform visualization */}
-                        <div className="h-6 flex-1 flex items-center justify-center">
-                            <div className="flex items-center h-full w-full space-x-[2px]">
-                                {waveformData.map((height, index) => (
-                                    <motion.div
-                                        key={index}
-                                        className="bg-white rounded-full w-[2px]"
-                                        initial={{ height: 2 }}
-                                        animate={{ height: Math.max(2, height) }}
-                                        transition={{ duration: 0.05 }}
-                                    />
-                                ))}
-                            </div>
+                    {/* Waveform visualization */}
+                    <div className="h-6 flex-1 flex items-center justify-center">
+                        <div className="flex items-center h-full w-full space-x-[2px]">
+                            {waveformData.map((height, index) => (
+                                <motion.div
+                                    key={index}
+                                    className="bg-white rounded-full w-[2px]"
+                                    initial={{ height: 2 }}
+                                    animate={{ height: Math.max(2, height) }}
+                                    transition={{ duration: 0.05 }}
+                                />
+                            ))}
                         </div>
+                    </div>
 
-                        {/* Stop button with spinner when processing */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleDone}
-                            className="h-8 w-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex-shrink-0"
-                            disabled={isProcessing}
-                        >
-                            {isProcessing ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                                <Square className="h-4 w-4 fill-white" />
-                            )}
-                        </Button>
-                    </motion.div>
+                    {/* Stop button with spinner when processing */}
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleDone}
+                        className="h-8 w-8 rounded-full bg-red-500 hover:bg-red-600 text-white flex-shrink-0"
+                        disabled={isProcessing}
+                    >
+                        {isProcessing ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                            <Square className="h-4 w-4 fill-white" />
+                        )}
+                    </Button>
                 </motion.div>
             )}
         </AnimatePresence>

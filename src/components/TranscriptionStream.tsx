@@ -43,7 +43,7 @@ const TranscriptionStream: React.FC<TranscriptionStreamProps> = ({
                 onStatusChange?.('transcribing');
 
                 // Call the API to start transcription
-                const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
+                const response = await fetch(`${API_BASE_URL}/transcribe`, {
                     method: 'POST',
                     ...defaultFetchOptions,
                     body: JSON.stringify({ youtube_url: `https://www.youtube.com/watch?v=${videoId}` }),
@@ -91,7 +91,7 @@ const TranscriptionStream: React.FC<TranscriptionStreamProps> = ({
         }
 
         // Create a new EventSource connection
-        const eventSourceUrl = `${API_BASE_URL}/api/transcription/${taskId}/stream`;
+        const eventSourceUrl = `${API_BASE_URL}/transcription/${taskId}/stream`;
         console.log('Connecting to stream:', eventSourceUrl);
 
         const eventSource = new EventSource(eventSourceUrl);

@@ -105,7 +105,7 @@ const TranscriptionDemo: React.FC = () => {
                     className="submit-button"
                     disabled={status === 'transcribing' || isLoading || !youtubeUrl}
                 >
-                    {isLoading ? 'Transcribing...' : 'Transcribe Video'}
+                    {isLoading ? 'Transcribing' : 'Transcribe Video'}
                 </button>
             </form>
 

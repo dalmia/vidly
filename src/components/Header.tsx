@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className={cn(
-        "w-full py-4 px-6 flex items-center justify-end",
+        "w-full py-2 px-6 flex items-center justify-end",
         className
       )}
     >

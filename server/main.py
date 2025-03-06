@@ -4,14 +4,15 @@ Simple FastAPI server that transcribes audio from a URL using Deepgram.
 """
 
 import os
+import traceback
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, HttpUrl
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-
+from services.models import Section
 # Load environment variables from server/.env file
 server_dir = Path(__file__).parent
 env_path = server_dir / '.env'
@@ -48,10 +49,15 @@ class TranscriptionResponse(BaseModel):
 class YouTubeRequest(BaseModel):
     youtube_url: str
 
-class YouTubeResponse(BaseModel):
+class SuccessResponse(BaseModel):
     success: bool
-    message: str
-    file_path: Optional[str] = None
+
+
+class AnswerQuestionRequest(BaseModel):
+    youtube_url: str
+    question: str
+    timestamp: str
+
 
 @app.get("/")
 async def root():
@@ -103,7 +109,8 @@ async def transcribe_audio(request: TranscriptionRequest):
         logger.error(f"Error transcribing audio: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error transcribing audio: {str(e)}")
 
-@app.post("/videos/extract_audio", response_model=YouTubeResponse)
+
+@app.post("/videos/extract_audio", response_model=SuccessResponse)
 async def extract_audio_from_youtube_video(request: YouTubeRequest):
     """
     Download audio from a YouTube video.
@@ -119,8 +126,6 @@ async def extract_audio_from_youtube_video(request: YouTubeRequest):
         logger.info(f"Audio downloaded successfully to: {audio_path}")
         return {
             "success": True,
-            "message": "Audio downloaded successfully",
-            "file_path": audio_path
         }
         
     except Exception as e:
@@ -128,7 +133,7 @@ async def extract_audio_from_youtube_video(request: YouTubeRequest):
         raise HTTPException(status_code=500, detail=f"Error downloading YouTube audio: {str(e)}")
 
 
-@app.post("/videos/transcribe", response_model=YouTubeResponse)
+@app.post("/videos/transcribe", response_model=SuccessResponse)
 async def transcribe_youtube(request: YouTubeRequest):
     """
     Transcribe a YouTube video.
@@ -141,20 +146,19 @@ async def transcribe_youtube(request: YouTubeRequest):
         logger.info(f"Processing YouTube URL for transcription: {request.youtube_url}")
                 
         logger.info("Transcribing the audio...")
-        transcription_result = transcribe(request.youtube_url)
+        await transcribe(request.youtube_url)
         logger.info("Transcription completed successfully")
         
         return {
             "success": True,
-            "message": "YouTube video transcribed successfully",
-            "file_path": transcription_result
         }
         
     except Exception as e:
         logger.error(f"Error transcribing YouTube video: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error transcribing YouTube video: {str(e)}")
 
-@app.post("/videos/create_sections", response_model=dict)
+
+@app.post("/videos/create_sections", response_model=List[Section])
 async def create_sections(request: YouTubeRequest):
     """
     Create sections for a YouTube video based on its transcription.
@@ -166,11 +170,48 @@ async def create_sections(request: YouTubeRequest):
         logger.info(f"Creating sections for YouTube URL: {request.youtube_url}")
         
         sections = await divide_video_into_sections(request.youtube_url)
-        return sections.model_dump()  # Return the Pydantic model as a dict
+        return sections
     
     except Exception as e:
         logger.error(f"Error creating sections: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error creating sections: {str(e)}")
+
+
+@app.post("/videos/answer_question", response_model=str)
+async def answer_question_endpoint(request: AnswerQuestionRequest):
+    """
+    Answer a question about a YouTube video based on its transcription and sections.
+    Assumes that the transcription and sections for the video already exist.
+    
+    Request should contain:
+    - youtube_url: The URL of the YouTube video
+    - question: The question to answer
+    - timestamp: The timestamp in the video (format: HH:MM:SS)
+    """
+    try:
+        from services.llm_service import answer_question
+        
+        youtube_url = request.youtube_url
+        question = request.question
+        timestamp = request.timestamp
+        
+        if not youtube_url or not question or not timestamp:
+            raise HTTPException(
+                status_code=400, 
+                detail="Missing required fields: youtube_url, question, or timestamp"
+            )
+        
+        logger.info(f"Answering question for YouTube URL: {youtube_url}")
+        logger.info(f"Question: {question}")
+        logger.info(f"Timestamp: {timestamp}")
+        
+        response = await answer_question(youtube_url, question, timestamp)
+        return response
+    
+    except Exception as e:
+        traceback.print_exc()
+        logger.error(f"Error answering question: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error answering question: {str(e)}")
 
 
 

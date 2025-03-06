@@ -27,7 +27,7 @@ def test_transcription_api():
     print("\n1. Starting transcription...")
     try:
         response = requests.post(
-            f"{API_BASE_URL}/api/transcribe",
+            f"{API_BASE_URL}/transcribe",
             json={"youtube_url": TEST_VIDEO_URL},
             timeout=30
         )
@@ -54,7 +54,7 @@ def test_transcription_api():
         try:
             print(f"   Attempt {attempts + 1}/{max_attempts}...")
             response = requests.get(
-                f"{API_BASE_URL}/api/transcription/{task_id}",
+                f"{API_BASE_URL}/transcription/{task_id}",
                 timeout=10
             )
             

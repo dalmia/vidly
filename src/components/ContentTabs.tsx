@@ -1,52 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MessageSquare, FileText, SendHorizonal, Loader2 } from 'lucide-react';
+import { MessageSquare, FileText } from 'lucide-react';
 import TranscriptionView from './TranscriptionView';
 import ChatInterface from './ChatInterface';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { useVideo } from '@/context/VideoContext';
-import VoiceInput from './VoiceInput';
 
 interface ContentTabsProps {
   currentVideoTime: number;
 }
 
 const ContentTabs: React.FC<ContentTabsProps> = ({ currentVideoTime }) => {
-  const { sendChatMessage } = useVideo();
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('chat');
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || isLoading) return;
-
-    setIsLoading(true);
-    const currentMessage = message;
-    setMessage('');
-
-    // Focus input after sending
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-
-    try {
-      await sendChatMessage(currentMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVoiceInput = (transcript: string) => {
-    setMessage(transcript);
-    // Optional: Automatically send the message after voice input
-    if (transcript.trim() && !isLoading) {
-      handleSendMessage(new Event('submit') as any);
-    }
-  };
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -73,16 +38,16 @@ const ContentTabs: React.FC<ContentTabsProps> = ({ currentVideoTime }) => {
             </TabsTrigger>
             <TabsTrigger value="transcription" className="flex items-center">
               <FileText className="h-4 w-4 mr-2" />
-              Transcription
+              Sections
             </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="chat" className="flex-1 h-full overflow-hidden">
+        <TabsContent value="chat" className="flex-1 overflow-hidden h-full">
           <ChatInterface />
         </TabsContent>
 
-        <TabsContent value="transcription" className="flex-1 h-full overflow-hidden">
+        <TabsContent value="transcription" className="flex-1 overflow-hidden h-full">
           <TranscriptionView
             currentTime={currentVideoTime}
             isActive={activeTab === 'transcription'}

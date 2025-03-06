@@ -31,7 +31,7 @@ def test_transcription_api():
     print("\nSending transcription request...")
     try:
         response = requests.post(
-            f"{API_BASE_URL}/api/transcribe",
+            f"{API_BASE_URL}/transcribe",
             json={"audio_url": TEST_AUDIO_URL},
             timeout=60  # Increased timeout for transcription
         )
