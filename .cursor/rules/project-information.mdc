@@ -1,0 +1,48 @@
+---
+description: Project information
+globs: 
+alwaysApply: true
+---
+# Vidly
+
+## Project Overview
+Vidly is a personalized learning platform that transforms YouTube videos into interactive learning experiences. Users can enter a video link and engage with it through AI-powered tools, enabling deeper understanding, retention, and collaboration.
+
+## Core Features
+
+### Interactive Learning
+- Chat with the video to get explanations and insights.
+- View and search transcripts to find key points quickly.
+- Generate mind maps to visualize learning concepts.
+
+### Social & Collaborative Learning
+- Bring friends to collaborate on the same video.
+- Ask and answer doubts in a shared learning space.
+- Discover new friends based on shared learning preferences.
+
+### Gamification & Engagement
+- Track learning streaks to stay consistent.
+- Earn points and climb the global leaderboard.
+- Get personalized reminders and quizzes to reinforce learning.
+
+### AI-Powered Enhancements
+- Automatically generate learning cards from videos.
+- Summarize videos for quick reviews.
+- AI-powered question generation for self-testing.
+
+## Technical Stack
+- **Frontend:** Next.js
+- **Styling:** Tailwind CSS with shadcn components
+- **Database:** SQLite (initial implementation)
+- **AI Integration:** OpenAI API for summarization, Q&A, and interactive chat
+
+## Deployment
+- **Current:** EC2 with Docker container
+- **Exploring:** Alternative hosting for cost and performance optimization
+
+## Development Priorities
+- Build a seamless and intuitive user experience.
+- Implement core interactive learning features first.
+- Focus on engagement and retention mechanisms.
+- Iterate based on user feedback and usage data.
+
