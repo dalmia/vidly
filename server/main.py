@@ -45,11 +45,19 @@ class TranscriptionRequest(BaseModel):
 class TranscriptionResponse(BaseModel):
     text: str
 
+class YouTubeRequest(BaseModel):
+    youtube_url: str
+
+class YouTubeResponse(BaseModel):
+    success: bool
+    message: str
+    file_path: Optional[str] = None
+
 @app.get("/")
 async def root():
-    return {"message": "Simple Transcription API", "status": "running"}
+    return {"status": "running"}
 
-@app.post("/api/transcribe", response_model=TranscriptionResponse)
+@app.post("/audios/transcribe", response_model=TranscriptionResponse)
 async def transcribe_audio(request: TranscriptionRequest):
     """
     Transcribe audio from a URL using Deepgram.
@@ -94,6 +102,77 @@ async def transcribe_audio(request: TranscriptionRequest):
     except Exception as e:
         logger.error(f"Error transcribing audio: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error transcribing audio: {str(e)}")
+
+@app.post("/videos/extract_audio", response_model=YouTubeResponse)
+async def extract_audio_from_youtube_video(request: YouTubeRequest):
+    """
+    Download audio from a YouTube video.
+    """
+    try:
+        from services.youtube_service import download_youtube_audio
+        
+        logger.info(f"Downloading audio from YouTube URL: {request.youtube_url}")
+        
+        # Download the audio
+        audio_path = await download_youtube_audio(request.youtube_url)
+        
+        logger.info(f"Audio downloaded successfully to: {audio_path}")
+        return {
+            "success": True,
+            "message": "Audio downloaded successfully",
+            "file_path": audio_path
+        }
+        
+    except Exception as e:
+        logger.error(f"Error downloading YouTube audio: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error downloading YouTube audio: {str(e)}")
+
+
+@app.post("/videos/transcribe", response_model=YouTubeResponse)
+async def transcribe_youtube(request: YouTubeRequest):
+    """
+    Transcribe a YouTube video.
+    Assumes that the audio for the video has already been extracted using /videos/extract_audio.
+    """
+    try:
+        from services.youtube_service import download_youtube_audio
+        from services.transcription_service import transcribe
+        
+        logger.info(f"Processing YouTube URL for transcription: {request.youtube_url}")
+                
+        logger.info("Transcribing the audio...")
+        transcription_result = transcribe(request.youtube_url)
+        logger.info("Transcription completed successfully")
+        
+        return {
+            "success": True,
+            "message": "YouTube video transcribed successfully",
+            "file_path": transcription_result
+        }
+        
+    except Exception as e:
+        logger.error(f"Error transcribing YouTube video: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error transcribing YouTube video: {str(e)}")
+
+@app.post("/videos/create_sections", response_model=dict)
+async def create_sections(request: YouTubeRequest):
+    """
+    Create sections for a YouTube video based on its transcription.
+    Assumes that the transcription for the video already exists.
+    """
+    try:
+        from services.llm_service import divide_video_into_sections
+        
+        logger.info(f"Creating sections for YouTube URL: {request.youtube_url}")
+        
+        sections = await divide_video_into_sections(request.youtube_url)
+        return sections.model_dump()  # Return the Pydantic model as a dict
+    
+    except Exception as e:
+        logger.error(f"Error creating sections: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating sections: {str(e)}")
+
+
 
 if __name__ == "__main__":
     import uvicorn

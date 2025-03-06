@@ -18,16 +18,10 @@ cd server
 pip install -r requirements.txt
 ```
 
-3. Create a `.env` file from the example:
+3. Create a `.env` file from the example and add the environment variables:
 
 ```bash
 cp .env.example .env
-```
-
-4. Add your Deepgram API key to the `.env` file:
-
-```
-DEEPGRAM_API_KEY=your_deepgram_api_key_here
 ```
 
 ### Frontend Setup
