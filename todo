@@ -5,3 +5,49 @@ sync video playback to chapter
 being able to tag timestamps or sections
 show summy of each section inside each section
 as video is playing, highlight the current section in the sections tab
+
+summary of the video
+actionables
+
+mindmap
+
+make ai respond with voice
+[07/03/25, 8:25:58 AM] Aman Dalmia: Video images to be sent around the context that user is asking question
+[07/03/25, 8:45:08 AM] Aman Dalmia: Remove api keys from GitHub
+[07/03/25, 9:25:04 AM] Aman Dalmia: Goodreads for youtube - people who you know what do they think of it
+[07/03/25, 10:25:17 AM] Aman Dalmia: do this for pdfs
+
+[07/03/25, 7:53:32 AM] Aman Dalmia: Notes - dictate notes
+[07/03/25, 7:53:52 AM] Aman Dalmia: Use notes and video content for flash cards to generate quizzes for enhancing retention
+[07/03/25, 8:02:16 AM] Aman Dalmia: Connect to whatsapp - start a flow for a video - all messages in that session go to that video's notes. Voice notes as well.
+
+[07/03/25, 7:39:10 AM] Aman Dalmia: oice output
+[07/03/25, 7:39:15 AM] Aman Dalmia: Context caching
+[07/03/25, 7:39:17 AM] Aman Dalmia: Mindmap
+[07/03/25, 7:39:24 AM] Aman Dalmia: Chrome extension
+[07/03/25, 7:39:25 AM] Aman Dalmia: App
+[07/03/25, 7:39:32 AM] Aman Dalmia: Web search
+[07/03/25, 7:39:37 AM] Aman Dalmia: Find similar videos
+[07/03/25, 7:39:44 AM] Aman Dalmia: Collaborate with friends
+[07/03/25, 7:39:56 AM] Aman Dalmia: Multimedia input and output in the chat
+[07/03/25, 7:40:05 AM] Aman Dalmia: Multilingual
+[07/03/25, 7:40:28 AM] Aman Dalmia: Better transcription of voice inputs - beyond browser tts
+[07/03/25, 7:40:36 AM] Aman Dalmia: Should not have to type or touch keyboard
+[07/03/25, 7:40:40 AM] Aman Dalmia: Auto scroll to bottom
+[07/03/25, 7:40:43 AM] Aman Dalmia: Responsive
+[07/03/25, 7:42:43 AM] Aman Dalmia: With vidly, you can simply enter the link to your youtube video and it provides a chatgpt-style interface where you can directly talk to it while it always retains the full context of the video to answer each question. It also generates meaningful chapters for each video with summaries for you to decide whether to watch a section or skip it.
+
+
+@gayathri
+I had built a non AI version of this many many years ago, a chrome extension which allows you to take notes and mark chapters on a YouTube video. This is next level
+
+@Aman Dalmia few ideas -
+
+See if you can make this into a chrome extension where the chat+sections part replaces the YouTube recommended sidebars. The proper interface can still remain, but whenever you use it with the extension on YouTube itself - that data syncs here. This will reduce a lot of friction (copy paste YouTube link)
+some way to take your own notes for each video
+
+@jay
+when is chrome extension coming?
+
+
+voice input state is not being reset after stop is clicked - being transfered over to the next video.

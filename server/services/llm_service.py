@@ -8,6 +8,7 @@ from pathlib import Path
 import google.generativeai as genai
 from typing import Optional, Dict, Any, List
 import backoff
+import instructor
 from services.utils.youtube_utils import extract_youtube_video_id
 from services.models import VideoSectionsLLM, AnswerQuestionLLM
 logger = logging.getLogger(__name__)
@@ -42,8 +43,6 @@ async def call_llm_with_instructor(
     Returns:
         The generated response as a structured object
     """
-    import instructor
-    
     if model_provider.lower() != "google":
         raise ValueError(f"Model provider '{model_provider}' is not supported yet. Currently only 'google' is supported.")
         

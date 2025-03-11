@@ -12,13 +12,31 @@ Transform YouTube from consumption to true learning.
 cd server
 ```
 
-2. Install Python dependencies:
+2. Install virtualenv (make sure you have python3.13 installed)
+
+```bash
+pip install virtualenv
+```
+
+3. Create a virtual environment:
+
+```bash
+virtualenv venv
+```
+
+4. Activate the virtual environment:
+
+```bash
+source venv/bin/activate
+```
+
+5. Install Python dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Create a `.env` file from the example and add the environment variables:
+6. Create a `.env` file from the example and add the environment variables:
 
 ```bash
 cp .env.example .env
@@ -35,14 +53,6 @@ npm install
 ## Running the Application
 
 ### Development Mode
-
-You can run both the frontend and backend servers with a single command:
-
-```bash
-./start-dev.sh
-```
-
-Or run them separately:
 
 #### Backend
 
