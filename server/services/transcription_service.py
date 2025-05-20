@@ -1,6 +1,8 @@
 import json
 import os
+from os.path import join
 import asyncio
+from glob import glob
 import logging
 from typing import List, Dict, Any, Optional
 from pathlib import Path
@@ -35,7 +37,14 @@ async def transcribe(youtube_url: str):
         return
 
     # Path to the audio file
-    audio_file_path = f"{root_dir}/data/{video_id}/audio.webm"
+    audio_file_dir = f"{root_dir}/data/{video_id}"
+    
+    files = glob(join(audio_file_dir, 'audio.*'))
+
+    if not files:
+        raise ValueError('No file found')
+    
+    audio_file_path = files[0]
 
     try:
         # Check file size before processing
