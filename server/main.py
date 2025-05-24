@@ -33,7 +33,7 @@ app = FastAPI(title="Simple Transcription API")
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins in development
+    allow_origins=["http://localhost:8080"],  # Allow all origins in development
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods
     allow_headers=["*"],  # Allow all headers
